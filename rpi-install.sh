@@ -36,7 +36,7 @@ echo
 read -r -p "Can I install rpitx? (Enter N to skip.) [y/n] " response
 if [[ $response =~ ^([yY][eE][sS]|[yY])$ ]]
 then
-	git clone https://github.com/ha7ilm/rpitx.git
+	git clone https://github.com/F5OEO/rpitx.git
 	cd rpitx
 	bash install.sh	
 	if [ $? -ne 0 ]; then
