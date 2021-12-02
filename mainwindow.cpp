@@ -58,6 +58,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define NMUX_MEMORY_MBYTE 50
 
+#define RELAY_TX 3
+
 //#define CMD_WFM "pgroup -9 bash -c \"rtl_tcp -s 2400000 -p 4951 -f 89500000 & (sleep 1; nc localhost 4951 | csdr convert_u8_f | csdr shift_addition_cc -0.085 | csdr fir_decimate_cc 10 0.05 HAMMING | csdr fmdemod_quadri_cf | csdr fractional_decimator_ff 5 | csdr deemphasis_wfm_ff 48000 50e-6 | csdr convert_f_i16 | mplayer -cache 768 -quiet -rawaudio samplesize=2:channels=1:rate=48000 -demuxer rawaudio -)\""
 
 
@@ -123,6 +125,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->widgetFFT, SIGNAL(shiftChanged(int)), this, SLOT(on_shiftChanged(int)));
     tmrRead.start(10);
     wiringPiSetup () ;
+    pinMode (RELAY_TX, OUTPUT) ;
 }
 
 void MainWindow::untoggleOtherModButtonsThan(QPushButton* pb)
@@ -284,6 +287,7 @@ void MainWindow::on_toggleTransmit_toggled(bool checked)
 {
     if(checked)
     {
+        digitalWrite (RELAY_TX, 0) ;
         QString modCmd = getModulatorCommand();
         procTX.start(modCmd);
         procTX.waitForStarted(1000);
@@ -294,6 +298,7 @@ void MainWindow::on_toggleTransmit_toggled(bool checked)
         {
             procKillTX.start("bash -c \"gksu touch; sudo killall rpitx\"");
             kill(procTX.pid(), SIGTERM);
+            digitalWrite (RELAY_TX, 1) ;
         }
     }
 }
